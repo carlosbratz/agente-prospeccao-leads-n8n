@@ -1,0 +1,297 @@
+{
+  "name": "Buscador de Leads Google Meu Negócio",
+  "nodes": [
+    {
+      "parameters": {
+        "contextWindowLength": 50
+      },
+      "id": "8f7ab952-031c-4093-90bb-031f1d0e1ff8",
+      "name": "Memória",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [-1080, 100],
+      "typeVersion": 1.3,
+      "notes": "TEMPLATE DESENVOLVIDO POR CARLOS BRATZ\nlinkedin.com/in/carlosjosebratz"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "YOUR_WEBHOOK_PATH",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-620, 120],
+      "id": "c23bea86-5fba-4efb-9e1a-1438be4eaa08",
+      "name": "Webhook",
+      "webhookId": "YOUR_WEBHOOK_ID",
+      "notes": "TEMPLATE DESENVOLVIDO POR CARLOS BRATZ\nlinkedin.com/in/carlosjosebratz"
+    },
+    {
+      "parameters": {
+        "url": "https://local-business-search.p.rapidapi.com/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {"name": "query", "value": "={{ $('Webhook').item.json.body.termo_de_busca }}"},
+            {"name": "limit", "value": "120"},
+            {"name": "language", "value": "PT"},
+            {"name": "region", "value": "br"},
+            {"name": "extract_emails_and_contacts", "value": "true"}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "x-rapidapi-host", "value": "local-business-search.p.rapidapi.com"},
+            {"name": "x-rapidapi-key", "value": "={{API-KEY-RAPIDAPI}}"}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-440, 120],
+      "id": "434c15c3-42cd-44d7-879a-bce1abcbd630",
+      "name": "rapidapi_local-business-search",
+      "notes": "TEMPLATE DESENVOLVIDO POR CARLOS BRATZ\nlinkedin.com/in/carlosjosebratz"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "SEU_GOOGLE_SHEETS_ID",
+          "mode": "list",
+          "cachedResultName": "Negócios Extraídos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/SEU_GOOGLE_SHEETS_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/SEU_GOOGLE_SHEETS_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome": "={{ $('separa_dados').item.json.name }}",
+            "Endereço": "={{ $('separa_dados').item.json.full_address }}",
+            "Cidade": "={{ $('separa_dados').item.json.city }}",
+            "CEP": "={{ $('separa_dados').item.json.zipcode }}",
+            "Rating": "={{ $('separa_dados').item.json.rating }}",
+            "Quantidade de Avaliações": "={{ $('separa_dados').item.json.review_count }}",
+            "Site": "={{ $('separa_dados').item.json.website }}",
+            "Business_id": "={{ $('separa_dados').item.json.business_id }}",
+            "Telefone": "={{ $('separa_dados').item.json.phone_number }}",
+            "Estado": "={{ $('separa_dados').item.json.state }}",
+            "Status 1": "Não enviado",
+            "Status 2": "Não enviado",
+            "Status 3": "Não enviado"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {"id": "Business_id", "displayName": "Business_id", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "Nome", "displayName": "Nome", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Telefone", "displayName": "Telefone", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "Endereço", "displayName": "Endereço", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Cidade", "displayName": "Cidade", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Estado", "displayName": "Estado", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "CEP", "displayName": "CEP", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Rating", "displayName": "Rating", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Quantidade de Avaliações", "displayName": "Quantidade de Avaliações", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Site", "displayName": "Site", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Status 1", "displayName": "Status 1", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "Status 2", "displayName": "Status 2", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "Status 3", "displayName": "Status 3", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false}
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [-80, 120],
+      "id": "aa1b0fd2-7d4f-4d8e-b4dc-032450b3cfc1",
+      "name": "inclui_dados_planilha",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "google_sheets_account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "TEMPLATE DESENVOLVIDO POR CARLOS BRATZ\nlinkedin.com/in/carlosjosebratz"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=Prompt do Agente de Prospecção de Negócios\n\nIDENTIDADE E MISSÃO\nVocê é um assistente especializado em prospecção de negócios. Sua função principal é interpretar solicitações de usuários sobre informações de empresas e negócios e acionar a ferramenta pega\\_dados\\_dos\\_negocios para coletar esses dados automaticamente em uma planilha.\n\nFERRAMENTA DISPONÍVEL\nNome: pega\\_dados\\_dos\\_negocios\nParâmetro obrigatório: termo\\_de\\_busca\nDescrição: string no formato \"\\[O que você busca] em \\[Cidade], \\[País/Estado]\". O termo pode ser escrito em português ou em inglês.\n\nDESCRIÇÃO DETALHADA DE termo\\_de\\_busca\nO campo termo\\_de\\_busca é utilizado para encontrar informações sobre estabelecimentos ou serviços em uma localidade específica. O texto pode estar em português ou em inglês e deve seguir esta estrutura:\n\\[O que você busca] em \\[Cidade], \\[País/Estado]\n\n* \\[O que você busca]: tipo de serviço ou estabelecimento (ex.: Hotéis, Restaurantes, Museus).\n* em: palavra fixa \"em\" (ou \"in\", se preferir inglês).\n* \\[Cidade], \\[País/Estado]: nome da cidade e do país ou estado.\n\nEXEMPLOS RÁPIDOS\nIntenção: Hotéis em São Francisco, EUA      -> termo\\_de\\_busca: Hotéis em São Francisco, EUA\nIntenção: Farmácias em Rio de Janeiro       -> termo\\_de\\_busca: Farmácias em Rio de Janeiro, Brasil\nIntenção: Restaurantes japoneses em São Paulo -> termo\\_de\\_busca: Restaurantes japoneses em São Paulo, Brasil\nIntenção: Aeroportos em Londres             -> termo\\_de\\_busca: Aeroportos em Londres, Reino Unido\n\nRESPONSABILIDADES PRINCIPAIS\n\n1. Interpretar solicitações: identificar tipo de negócio, localização e filtros.\n2. Construir o termo\\_de\\_busca: montar a string no formato exigido, em português ou inglês conforme necessário.\n3. Acionar a ferramenta:\n   pega\\_dados\\_dos\\_negocios({ \"termo\\_de\\_busca\": \"\\[consulta]\" })\n4. Confirmar execução: informar ao usuário que os dados foram coletados e adicionados à planilha.\n\nDIRETRIZES DE COMPORTAMENTO\nAo receber uma solicitação:\n\n* Identificar os elementos‑chave.\n* Normalizar os termos e montar o termo\\_de\\_busca no formato correto.\n* Chamar a ferramenta e responder de forma concisa ao usuário.\n\nFORMATO DA RESPOSTA AO USUÁRIO\n\n* Confirmar o que foi solicitado.\n* Informar que a busca foi realizada e que os dados estão na planilha.\n\nEXEMPLOS DE INTERAÇÃO\nExemplo 1\nUsuário: \"Quero informações sobre clínicas médicas no Rio de Janeiro\".\nAgente:\ntermo\\_de\\_busca: Clínicas médicas em Rio de Janeiro, Brasil\nChamada: pega\\_dados\\_dos\\_negocios({ \"termo\\_de\\_busca\": \"Clínicas médicas em Rio de Janeiro, Brasil\" })\nResposta: Busquei e coletei informações sobre clínicas médicas no Rio de Janeiro. Os dados já foram adicionados à sua planilha de prospecção.\n\nExemplo 2\nUsuário: \"Preciso de dados de restaurantes japoneses em São Paulo\".\nAgente:\ntermo\\_de\\_busca: Restaurantes japoneses em São Paulo, Brasil\nChamada: pega\\_dados\\_dos\\_negocios({ \"termo\\_de\\_busca\": \"Restaurantes japoneses em São Paulo, Brasil\" })\nResposta: Coletei informações sobre restaurantes japoneses em São Paulo. Todos os dados foram inseridos na planilha.\n\nExemplo 3\nUsuário: \"Me ajuda a encontrar escritórios de advocacia especializados em direito trabalhista na Zona Sul do Rio\".\nAgente:\ntermo\\_de\\_busca: Escritórios de advocacia trabalhista em Zona Sul Rio de Janeiro, Brasil\nChamada: pega\\_dados\\_dos\\_negocios({ \"termo\\_de\\_busca\": \"Escritórios de advocacia trabalhista em Zona Sul Rio de Janeiro, Brasil\" })\nResposta: Busquei escritórios de advocacia especializados em direito trabalhista na Zona Sul do Rio de Janeiro. As informações já estão disponíveis na sua planilha.\n\nTRATAMENTO DE CASOS ESPECIAIS\nSolicitações ambíguas: pedir esclarecimentos.\nMúltiplas localizações: executar buscas separadas e avisar o usuário.\nSegmentos amplos: sugerir refinamentos.\n\nRESPOSTAS PADRÃO\nApós coleta bem‑sucedida: \"Coletei as informações sobre \\[busca] em \\[local]. Os dados já foram adicionados à sua planilha de prospecção.\"\nQuando precisar de esclarecimentos: \"Para garantir que eu colete as informações mais relevantes, poderia especificar \\[informação faltante]?\"\nPara confirmação: \"Entendi que você precisa de dados sobre \\[busca] em \\[local]. Vou coletar essas informações agora.\"\n\nPRINCÍPIOS IMPORTANTES\n\n* Proatividade: deduzir intenções com informações incompletas quando possível.\n* Precisão: usar o formato exato de termo\\_de\\_busca.\n* Concisão: confirmar a ação sem explicações desnecessárias.\n* Confiabilidade: sempre confirmar quando os dados forem adicionados.\n\nLIMITAÇÕES\n\n* Não fornecer os dados diretamente na conversa.\n* Não analisar nem interpretar os dados coletados.\n* Não sugerir estratégias de prospecção.\n* Focar apenas em coletar e confirmar a inserção dos dados na planilha.\n\nLembre-se: Você é a ponte entre a solicitação do usuário e a coleta automatizada de dados. Interprete corretamente, construa o termo\\_de\\_busca e acione a ferramenta com precisão.\n"
+        }
+      },
+      "id": "3d75a631-e35b-493c-a3a4-28027037e1d7",
+      "name": "Agente IA",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [-1160, -40],
+      "typeVersion": 1.8,
+      "notes": "TEMPLATE DESENVOLVIDO POR CARLOS BRATZ\nlinkedin.com/in/carlosjosebratz"
+    },
+    {
+      "parameters": {
+        "content": "### API SCRAPING GOOGLE MAPS\n\nLink: https://rapidapi.com/letscrape-6bRBa3QguO5/api/local-business-search",
+        "height": 340,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-500, -40],
+      "typeVersion": 1,
+      "id": "cb4952e8-e19e-4531-9473-ec8bc6ced4d5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [-880, -40],
+      "id": "f7343f1f-6704-4240-814a-1c3c82e06a7b",
+      "name": "Fim2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [240, 120],
+      "id": "4905d6bf-a0b7-44a3-8ce7-6da19add18a9",
+      "name": "Fim1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "51036668-1df4-469b-aae3-915f8612f9b4",
+      "name": "Solicitar leads",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [-1300, -40],
+      "webhookId": "YOUR_CHAT_TRIGGER_WEBHOOK_ID",
+      "typeVersion": 1.1,
+      "notes": "TEMPLATE DESENVOLVIDO POR CARLOS BRATZ\nlinkedin.com/in/carlosjosebratz"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "34eff11f-eac8-4228-a91a-e1aac7823e8c",
+      "name": "Modelo de Linguagem",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [-1200, 100],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "openai_account"
+        }
+      },
+      "notes": "TEMPLATE DESENVOLVIDO POR CARLOS BRATZ\nlinkedin.com/in/carlosjosebratz"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Busca dados de estabelecimentos, empresas e serviços a partir de um termo de busca",
+        "method": "POST",
+        "url": "={{URL-WEBHOOK}}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "termo_de_busca", "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [-940, 100],
+      "id": "f02f958a-def6-4336-8f37-6e4dae0fd1e3",
+      "name": "busca_dados",
+      "notes": "TEMPLATE DESENVOLVIDO POR CARLOS BRATZ\nlinkedin.com/in/carlosjosebratz"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [-240, 120],
+      "id": "35938e43-1649-48d1-b825-5a3005ef3de4",
+      "name": "separa_dados",
+      "notes": "TEMPLATE DESENVOLVIDO POR CARLOS BRATZ\nlinkedin.com/in/carlosjosebratz"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {"id": "26b63941-4d20-43ff-af60-6b148ce28706", "name": "response", "value": "Preenchi lá na planilha os negócios que eu encontrei", "type": "string"}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [80, 120],
+      "id": "0a4f4074-2d0f-4916-bc2f-51a8dc9f8205",
+      "name": "responde_IA",
+      "notes": "TEMPLATE DESENVOLVIDO POR CARLOS BRATZ\nlinkedin.com/in/carlosjosebratz"
+    },
+    {
+      "parameters": {"content": "", "height": 720, "width": 1760, "color": 7},
+      "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-1340, -220],
+      "id": "4a8d257e-959b-43ba-9a6b-ebeda72a7323", "name": "Sticky Note1"
+    },
+    {
+      "parameters": {"content": "## FLUXO BUSCADOR DE LEADS GOOGLE MEU NEGÓCIO", "height": 80, "width": 660, "color": 5},
+      "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-820, -200],
+      "id": "986f24bc-a074-4666-bf73-03c888519799", "name": "Sticky Note2"
+    },
+    {
+      "parameters": {"content": "## Instruções de Uso\n🔴 Áreas em vermelho você deve realizar alterações de acordo com seu canal de entrada;\n🟢 Áreas em verde já estão pré configuradas para o canal do Template, caso vá utilizar outro canal, também fazer devidas alterações nesses nodes;\n\n⚠️ Atenção: \n1. Não altere nome de parâmetros pré-existentes para para evitar quebra do fluxo;\n2. Fique a vontade para adicionar novos parâmetros caso necessário;", "height": 220, "width": 690, "color": 3},
+      "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-1320, 260],
+      "id": "b40221da-a968-41e8-a888-7b8b4cbc61af", "name": "Sticky Note20"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Memória": {"ai_memory": [[{"node": "Agente IA", "type": "ai_memory", "index": 0}]]},
+    "Webhook": {"main": [[{"node": "rapidapi_local-business-search", "type": "main", "index": 0}]]},
+    "rapidapi_local-business-search": {"main": [[{"node": "separa_dados", "type": "main", "index": 0}]]},
+    "inclui_dados_planilha": {"main": [[{"node": "responde_IA", "type": "main", "index": 0}]]},
+    "Agente IA": {"main": [[{"node": "Fim2", "type": "main", "index": 0}]]},
+    "Solicitar leads": {"main": [[{"node": "Agente IA", "type": "main", "index": 0}]]},
+    "Modelo de Linguagem": {"ai_languageModel": [[{"node": "Agente IA", "type": "ai_languageModel", "index": 0}]]},
+    "busca_dados": {"ai_tool": [[{"node": "Agente IA", "type": "ai_tool", "index": 0}]]},
+    "separa_dados": {"main": [[{"node": "inclui_dados_planilha", "type": "main", "index": 0}]]},
+    "responde_IA": {"main": [[{"node": "Fim1", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "YOUR_VERSION_ID",
+  "meta": {
+    "instanceId": "YOUR_INSTANCE_ID"
+  },
+  "id": "YOUR_WORKFLOW_ID",
+  "tags": []
+}
